@@ -1,52 +1,80 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using System.Data;
-using System.Data.SqlClient;
-using HotelReservationSystem.Data;
-
-public class AccountController : Controller
+﻿namespace HotelReservationSystem.Controllers
 {
-    private readonly DatabaseHelper _db;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Microsoft.IdentityModel.Tokens;
+    using System;
+    using System.Data;
+    using System.Data.SqlClient;
+    using System.IdentityModel.Tokens.Jwt;
+    using System.Security.Claims;
+    using System.Text;
+    using HotelReservationSystem.Data;
+    using HotelReservationSystem.Models;
 
-    public AccountController(IConfiguration configuration)
+    [Route("[controller]/[action]")]
+    public class AccountController : Controller
     {
-        _db = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
-    }
+        private readonly DatabaseHelper _db;
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<AccountController> _logger;
 
-    [HttpGet]
-    public IActionResult Login()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    public IActionResult Login(string username, string password)
-    {
-        string query = "SELECT * FROM Utenti WHERE Username = @Username";
-        SqlParameter[] parameters = { new SqlParameter("@Username", username) };
-        DataTable userTable = _db.ExecuteQuery(query, parameters);
-
-        if (userTable.Rows.Count == 1)
+        public AccountController(IConfiguration configuration, ILogger<AccountController> logger)
         {
-            DataRow userRow = userTable.Rows[0];
-            string hashedPassword = userRow["PasswordHash"].ToString();
-            if (PasswordHelper.VerifyPassword(password, hashedPassword))
-            {
-                HttpContext.Session.SetString("Username", username);
-                HttpContext.Session.SetString("Role", userRow["Ruolo"].ToString());
-                return RedirectToAction("Index", "Home");
-            }
+            _db = new DatabaseHelper(configuration.GetConnectionString("DefaultConnection"));
+            _configuration = configuration;
+            _logger = logger;
         }
 
-        ViewBag.Message = "Invalid username or password";
-        return View();
-    }
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
 
-    public IActionResult Logout()
-    {
-        HttpContext.Session.Clear();
-        return RedirectToAction("Login");
+        [HttpPost]
+        public IActionResult Login([FromBody] LoginModel model)
+        {
+            _logger.LogInformation("Login attempt for user {Username}", model.Username);
+
+            string query = "SELECT * FROM Utenti WHERE Username = @Username";
+            SqlParameter[] parameters = { new SqlParameter("@Username", model.Username) };
+            DataTable userTable = _db.ExecuteQuery(query, parameters);
+
+            if (userTable.Rows.Count == 1)
+            {
+                DataRow userRow = userTable.Rows[0];
+                string hashedPassword = userRow["PasswordHash"].ToString();
+                if (PasswordHelper.VerifyPassword(model.Password, hashedPassword))
+                {
+                    var tokenHandler = new JwtSecurityTokenHandler();
+                    var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+                    var tokenDescriptor = new SecurityTokenDescriptor
+                    {
+                        Subject = new ClaimsIdentity(new[]
+                        {
+                            new Claim(ClaimTypes.Name, model.Username),
+                            new Claim(ClaimTypes.Role, userRow["Ruolo"].ToString())
+                        }),
+                        Expires = DateTime.UtcNow.AddHours(1),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                    };
+                    var token = tokenHandler.CreateToken(tokenDescriptor);
+                    _logger.LogInformation("Login successful for user {Username}", model.Username);
+                    return Ok(new { Token = tokenHandler.WriteToken(token) });
+                }
+                else
+                {
+                    _logger.LogWarning("Invalid password for user {Username}", model.Username);
+                }
+            }
+            else
+            {
+                _logger.LogWarning("User not found: {Username}", model.Username);
+            }
+
+            return Unauthorized(new { Message = "Invalid credentials" });
+        }
     }
 }
-

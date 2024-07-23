@@ -1,17 +1,11 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Clienti";
-}
-
-@model List<HotelReservationSystem.Models.Cliente>
-
-@{
-    ViewBag.Title = "Clienti";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Clienti</h2>
 
-<table class="table">
+<table class="table" id="clientiTable">
     <thead>
         <tr>
             <th>Codice Fiscale</th>
@@ -26,23 +20,7 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var cliente in Model)
-        {
-            <tr>
-                <td>@cliente.CodiceFiscale</td>
-                <td>@cliente.Cognome</td>
-                <td>@cliente.Nome</td>
-                <td>@cliente.Città</td>
-                <td>@cliente.Provincia</td>
-                <td>@cliente.Email</td>
-                <td>@cliente.Telefono</td>
-                <td>@cliente.Cellulare</td>
-                <td>
-                    <a href="@Url.Action("Details", "Clienti", new { id = cliente.CodiceFiscale })">Dettagli</a> |
-                    <a href="@Url.Action("Edit", "Clienti", new { id = cliente.CodiceFiscale })">Modifica</a> |
-                    <a href="@Url.Action("Delete", "Clienti", new { id = cliente.CodiceFiscale })">Elimina</a>
-                </td>
-            </tr>
-        }
     </tbody>
 </table>
+
+<script src="/js/clienti.js"></script>

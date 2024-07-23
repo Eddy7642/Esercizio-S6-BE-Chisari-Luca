@@ -1,10 +1,11 @@
 ﻿@{
     ViewBag.Title = "Login";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h2>Login</h2>
 
-<form asp-action="Login" method="post">
+<form id="loginForm">
     <div class="form-group">
         <label for="username">Username</label>
         <input type="text" class="form-control" id="username" name="username" required />
@@ -16,9 +17,4 @@
     <button type="submit" class="btn btn-primary">Login</button>
 </form>
 
-@if (ViewBag.Message != null)
-{
-    <div class="alert alert-danger">
-        @ViewBag.Message
-    </div>
-}
+<script src="/js/auth.js"></script>
