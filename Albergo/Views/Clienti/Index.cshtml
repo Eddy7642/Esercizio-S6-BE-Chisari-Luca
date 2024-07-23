@@ -1,0 +1,48 @@
+﻿
+@{
+    ViewBag.Title = "Clienti";
+}
+
+@model List<HotelReservationSystem.Models.Cliente>
+
+@{
+    ViewBag.Title = "Clienti";
+}
+
+<h2>Clienti</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Codice Fiscale</th>
+            <th>Cognome</th>
+            <th>Nome</th>
+            <th>Città</th>
+            <th>Provincia</th>
+            <th>Email</th>
+            <th>Telefono</th>
+            <th>Cellulare</th>
+            <th>Azioni</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cliente in Model)
+        {
+            <tr>
+                <td>@cliente.CodiceFiscale</td>
+                <td>@cliente.Cognome</td>
+                <td>@cliente.Nome</td>
+                <td>@cliente.Città</td>
+                <td>@cliente.Provincia</td>
+                <td>@cliente.Email</td>
+                <td>@cliente.Telefono</td>
+                <td>@cliente.Cellulare</td>
+                <td>
+                    <a href="@Url.Action("Details", "Clienti", new { id = cliente.CodiceFiscale })">Dettagli</a> |
+                    <a href="@Url.Action("Edit", "Clienti", new { id = cliente.CodiceFiscale })">Modifica</a> |
+                    <a href="@Url.Action("Delete", "Clienti", new { id = cliente.CodiceFiscale })">Elimina</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
