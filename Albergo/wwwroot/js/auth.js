@@ -19,7 +19,7 @@
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    return response.json(); // Questo potrebbe lanciare un'eccezione se il JSON è vuoto
+                    return response.json();
                 })
                 .then(result => {
                     if (result.token) {

@@ -1,4 +1,5 @@
-﻿INSERT INTO Clienti (CodiceFiscale, Cognome, Nome, Città, Provincia, Email, Telefono, Cellulare) VALUES
-('RSSMRA85M01H501Z', 'Rossi', 'Mario', 'Roma', 'RM', 'mario.rossi@example.com', '069123456', '3291234567'),
-('BNCLRA80A41F205X', 'Bianchi', 'Laura', 'Firenze', 'FI', 'laura.bianchi@example.com', '055987654', '3289876543'),
-('VRDLGI75D08H501Y', 'Verdi', 'Luigi', 'Milano', 'MI', 'luigi.verdi@example.com', '028765432', '3278765432');
+﻿INSERT INTO Clienti (CodiceFiscale, Cognome, Nome, Città, Provincia, Email, Telefono, Cellulare)
+VALUES
+('RSSMRA85M01H501Z', 'Rossi', 'Mario', 'Roma', 'RM', 'mario.rossi@example.com', '0612345678', '3391234567'),
+('BNCGPP75A01F205X', 'Bianchi', 'Giuseppe', 'Milano', 'MI', 'giuseppe.bianchi@example.com', '0287654321', '3387654321'),
+('VRDLGI80A01C573X', 'Verdi', 'Luigi', 'Napoli', 'NA', 'luigi.verdi@example.com', '0811234567', '3371234567');
